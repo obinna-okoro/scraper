@@ -2,8 +2,13 @@ import puppeteer from "puppeteer";
 import xpath from "xpath"
 import { DOMParser } from "xmldom";
 
+
+
+
+
 (async () => {
   const browser = puppeteer.launch({ headless: true });
+  
   const page = await (await browser).newPage();
 
   await page.setUserAgent(
@@ -14,7 +19,7 @@ import { DOMParser } from "xmldom";
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
   );
 
-  await page.waitForXPath("//strong")
+  await page.waitForXPath("//strong//code")
  
 
   const bodyHTML = await page.evaluate(() => document.body.innerHTML);
@@ -22,28 +27,48 @@ import { DOMParser } from "xmldom";
 
 
     const doc = new DOMParser().parseFromString(bodyHTML)
-    const nodes = xpath.select("//strong", doc);
-
-  const parseStrongText = nodes.map((node) => {
-      if(node.childNodes[0].childNodes) {
-            return node.childNodes[0].childNodes[0].data;
-        }
 
 
-        return node.childNodes[0].data;
+    // Ziel-Xpath
+    const nodes = xpath.select("//strong//code", doc);
 
+
+    //Array erstellung
+    const parseStrongText = nodes.map((node) => {
+    
+         return node.childNodes[0].data;
+    
     })
 
-  const allStrongText = parseStrongText.filter((element) => element !== undefined )
-
-  allStrongText.forEach((data, i) => console.log(`${data} ${i} \n`) )
-
-  console.log(`Length of Array: ${allStrongText.length} \n\n`)
-
   
-  if (process.argv[2]) {
-      console.log(`${allStrongText[process.argv[2]]}  ${allStrongText.indexOf(allStrongText[process.argv[2]])}`)  
+    //Array-Elemente mit Nummer zur Laufzeit zu finden
+
+    if (process.argv[2]) {
+
+      console.log(`\n Array Element at Number ${process.argv[2]}: ${parseStrongText[process.argv[2]]} \n`)  
+
+    } else {
+      
+      console.log(`\n\n Array Length: ${parseStrongText.length} \n`)
+
+
+      //Zugriff auf ein Array element (mit index)
+  
+      const first = parseStrongText[0]
+  
+      const last = parseStrongText[parseStrongText.length - 1]
+  
+      console.log(`First: ${first} \n`)
+      console.log(`Last: ${last} \n`)
+  
+  
+  
+      //Über ein Array Iterieren
+  
+      parseStrongText.forEach((el, i) => console.log(`${el} ${i}`) )
+  
+    
     }
 
-  await (await browser).close();
+    await (await browser).close();
 })();
