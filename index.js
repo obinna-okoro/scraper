@@ -18,7 +18,7 @@ import { DOMParser } from "xmldom";
     "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array"
   );
 
-  await page.waitForXPath("//strong//code");
+  await page.waitForXPath('//section//h3');
  
 
   const bodyHTML = await page.evaluate(() => document.body.innerHTML);
@@ -29,45 +29,44 @@ import { DOMParser } from "xmldom";
 
 
     // Ziel-Xpath
-    const nodes = xpath.select("//strong//code", doc);
+    const nodes = xpath.select('//section//h3', doc);
 
 
-    //Array erstellung
-    const parseStrongText = nodes.map((node) => {
+    // Array erstellung
+    const parseStrongText = nodes.map( (node) => {
     
-         return node.childNodes[0].data;
+      if (node.lastChild.firstChild !== null)
+    return node.lastChild.firstChild.data
     
     });
 
+    console.log(parseStrongText, "\n\n")
+
+ 
+
+ 
+
+
   
-    //Array-Elemente mit Nummer zur Laufzeit zu finden
+
+  //  Array-Elemente mit Nummer zur Laufzeit zu finden
+
+
 
     if (process.argv[2]) {
+
+      if(!isNaN(process.argv[2])) {
 
       console.log(`\n Array Element at Number ${process.argv[2]}: ${parseStrongText[process.argv[2]]} \n`);  
 
     } else {
-      
-      console.log(`\n\n Array Length: ${parseStrongText.length} \n`);
-
-
-      //Zugriff auf ein Array element (mit index)
-  
-      const first = parseStrongText[0];
-  
-      const last = parseStrongText[parseStrongText.length - 1];
-  
-      console.log(`First: ${first} \n`);
-      console.log(`Last: ${last} \n`);
-  
-  
-  
-      //Über ein Array Iterieren
-  
-      parseStrongText.forEach((el, i) => console.log(`${el} ${i}`) );
-  
+     
+      const arrayEl = parseStrongText.filter(element => element.toLowerCase().includes(process.argv[2].toLowerCase()))
+      console.log(arrayEl)
+      }
     
-    }
+  }
+    
 
     await (await browser).close();
 })();
